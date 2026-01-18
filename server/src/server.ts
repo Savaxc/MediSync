@@ -13,6 +13,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+//Test route
 app.get("/api", (req, res) => {
   res.json({ nesto: ["backend", "check"] });
 });
