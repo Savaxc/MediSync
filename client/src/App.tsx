@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/react-router';
-import axios from 'axios';
+import { uploadMedicalReport } from './features/upload/upload.service';
+import { AnalysisDisplay } from './features/upload/components/AnalysisDisplay';
 import './App.css';
 
 function App() {
@@ -9,91 +11,68 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
 
-  const handleUpload = async () => {
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) setFile(e.target.files[0]);
+  };
+
+  const handleProcess = async () => {
     if (!file) return;
-
     setLoading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
-      const response = await axios.post('http://localhost:8080/api/medical/upload', formData);
-      setAnalysis(response.data);
-    } catch (error) {
-      console.error("Greška pri slanju:", error);
-      alert("Došlo je do greške prilikom analize nalaza.");
+      const data = await uploadMedicalReport(file);
+      setAnalysis(data);
+    } catch (err) {
+      alert("Došlo je do greške pri analizi.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="app-container">
-      <header className="main-header">
-        <h1>MediSync AI</h1>
-        <div className="auth-zone">
+    <div className="max-w-4xl mx-auto p-6 min-h-screen font-sans">
+      <header className="flex justify-between items-center py-6 border-b mb-8">
+        <h1 className="text-2xl font-bold text-blue-600">MediSync AI</h1>
+        <div>
           <SignedOut>
             <SignInButton fallbackRedirectUrl="/" />
           </SignedOut>
           <SignedIn>
-            <UserButton />
+            <UserButton afterSignOutUrl="/" />
           </SignedIn>
         </div>
       </header>
 
-      <main className="content">
+      <main>
         <SignedIn>
-          <div className="upload-card">
-            <h2>Zdravo! Ubaci sliku svog nalaza</h2>
-            <p>AI će ti objasniti rezultate prostim rečima.</p>
-            
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={(e) => setFile(e.target.files?.[0] || null)} 
-              className="file-input"
-            />
-            
+          <div className="bg-slate-50 p-8 rounded-2xl border-2 border-dashed border-slate-200 text-center">
+            <h2 className="text-xl font-semibold mb-4">Pošalji laboratorijski nalaz</h2>
+            <input type="file" onChange={onFileChange} className="block mx-auto mb-4" />
             <button 
-              onClick={handleUpload} 
+              onClick={handleProcess}
               disabled={!file || loading}
-              className="upload-button"
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400 transition-all"
             >
-              {loading ? 'Analiziram...' : 'Započni analizu'}
+              {loading ? 'AI analizira...' : 'Započni analizu'}
             </button>
           </div>
 
-          {analysis && (
-            <div className="results-card">
-              <h3>Rezime:</h3>
-              <p className="summary-text">{analysis.summary}</p>
-              
-              <table className="results-table">
-                <thead>
-                  <tr>
-                    <th>Parametar</th>
-                    <th>Vrednost</th>
-                    <th>Referentni opseg</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {analysis.results.map((item: any, idx: number) => (
-                    <tr key={idx}>
-                      <td>{item.parameter}</td>
-                      <td>{item.value} {item.unit}</td>
-                      <td>{item.referenceRange}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {loading && (
+            <div className="text-center mt-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600 mb-2"></div>
+              <p className="text-gray-500">Molim sačekaj, AI očitava tvoj nalaz...</p>
             </div>
           )}
+
+          {analysis && <AnalysisDisplay data={analysis} />}
         </SignedIn>
 
         <SignedOut>
-          <div className="hero">
-            <h2>Vaš lični asistent za laboratorijske nalaze</h2>
-            <p>Prijavite se da biste digitalizovali svoje zdravstvene podatke.</p>
+          <div className="text-center py-20">
+            <h2 className="text-3xl font-bold mb-4">Vaš digitalni zdravstveni asistent</h2>
+            <p className="text-gray-600 mb-8">Prijavite se kako biste dobili jasna objašnjenja svojih medicinskih rezultata.</p>
+            <SignInButton mode="modal">
+               <button className="bg-blue-600 text-white px-10 py-4 rounded-xl font-bold shadow-lg">Započni besplatno</button>
+            </SignInButton>
           </div>
         </SignedOut>
       </main>
