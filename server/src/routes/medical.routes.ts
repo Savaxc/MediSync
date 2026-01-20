@@ -52,4 +52,26 @@ router.post('/upload', requireAuth, upload.single('file'), async (req: any, res)
   }
 });
 
+
+router.get('/history', requireAuth, async (req: any, res) => {
+  try {
+    const userId = req.auth.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Niste autorizovani' });
+    }
+
+    // Pronalazimo sve nalaze za tog korisnika, sortirane od najnovijeg ka najstarijem
+    const records = await prisma.medicalRecord.findMany({
+      where: { userId: userId },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json(records);
+  } catch (error) {
+    console.error("Greška pri dohvaćanju istorije:", error);
+    res.status(500).json({ error: 'Greška na serveru.' });
+  }
+});
+
 export default router;
