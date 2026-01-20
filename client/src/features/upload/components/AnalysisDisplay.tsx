@@ -15,7 +15,7 @@ interface AnalysisResult {
 interface Props {
   data: {
     summary: string;
-    results: AnalysisResult[];
+    fullAnalysis: AnalysisResult[];
   };
 }
 
@@ -49,7 +49,7 @@ export const AnalysisDisplay = ({ data }: Props) => {
         </div>
 
         <div className="divide-y divide-slate-100">
-          {data.results.map((res, idx) => {
+          {data.fullAnalysis?.map((res, idx) => {
             const isExpanded = expandedIndex === idx;
             const isIssue = res.status !== 'normal';
 

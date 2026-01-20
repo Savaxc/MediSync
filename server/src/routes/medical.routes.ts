@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { analyzeMedicalReport } from '../services/ai.service';
+import { prisma } from '../lib/prisma';
+import { requireAuth } from '../middleware/auth';
+import clerkClient from '@clerk/clerk-sdk-node';
 
 const router = Router();
 
@@ -11,19 +14,41 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } // Limit 5MB
 });
 
-router.post('/upload', upload.single('file'), async (req, res) => {
+router.post('/upload', requireAuth, upload.single('file'), async (req: any, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'Niste poslali sliku.' });
-    }
+    const userId = req.auth.userId;
+    if (!userId) return res.status(401).json({ error: 'Niste autorizovani' });
 
-    // Pozivamo AI magiju
+    //Dohvatanje email-a od clerk-a (Uzimamo pune podatke o korisniku preko SDK-a)
+    const clerkUser = await clerkClient.users.getUser(userId);
+    const email = clerkUser.emailAddresses[0]?.emailAddress || "no-email@medisync.com";
+
+    if (!req.file) return res.status(400).json({ error: 'Nema fajla' });
+
     const aiAnalysis = await analyzeMedicalReport(req.file.buffer);
 
-    res.json(aiAnalysis);
-  } catch (error: any) {
-    console.error("Greška na serveru:", error.message);
-    res.status(500).json({ error: 'Greška pri obradi nalaza.' });
+    //prisma upsert 
+    const user = await prisma.user.upsert({
+      where: { id: userId },
+      update: { email: email },
+      create: {
+        id: userId,
+        email: email,
+      },
+    });
+
+    const savedRecord = await prisma.medicalRecord.create({
+      data: {
+        userId: user.id,
+        summary: aiAnalysis.summary,
+        fullAnalysis: aiAnalysis.results,
+      }
+    });
+
+    res.json(savedRecord);
+  } catch (error) {
+    console.error("DETALJNA GREŠKA:", error);
+    res.status(500).json({ error: 'Greška pri obradi podataka.' });
   }
 });
 

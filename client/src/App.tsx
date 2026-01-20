@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/react-router';
+import { SignedIn, SignedOut, SignInButton, useAuth, UserButton } from '@clerk/react-router';
 import { uploadMedicalReport } from './features/upload/upload.service';
 import { AnalysisDisplay } from './features/upload/components/AnalysisDisplay';
 import './App.css';
@@ -10,6 +10,7 @@ function App() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
+  const { getToken } = useAuth();
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) setFile(e.target.files[0]);
@@ -19,7 +20,8 @@ function App() {
     if (!file) return;
     setLoading(true);
     try {
-      const data = await uploadMedicalReport(file);
+      const data = await uploadMedicalReport(file, getToken);
+      console.log("Podaci sa servera:", data);
       setAnalysis(data);
     } catch (err) {
       alert("Došlo je do greške pri analizi.");
