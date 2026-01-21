@@ -4,8 +4,11 @@ import {
   ChevronUp,
   AlertCircle,
   CheckCircle2,
-  Info
+  Info,
+  Download
 } from 'lucide-react';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { ReportPDF } from './ReportPDF';
 
 interface AnalysisResult {
   parameter: string;
@@ -27,6 +30,7 @@ interface Props {
 
 export const AnalysisDisplay = ({ data }: Props) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const currentDate = new Date().toLocaleDateString('sr-RS');
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
@@ -34,6 +38,22 @@ export const AnalysisDisplay = ({ data }: Props) => {
 
   return (
     <div className="mt-10 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      
+      {/* Dugme za PDF preuzimanje */}
+      <div className="flex justify-end">
+        <PDFDownloadLink
+          document={<ReportPDF data={data} date={currentDate} />}
+          fileName={`MediSync_Izvestaj_${currentDate}.pdf`}
+          className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-900 transition-all text-sm font-bold shadow-sm"
+        >
+          {({ loading }) => (
+            <>
+              <Download size={18} />
+              {loading ? 'Priprema PDF-a...' : 'Preuzmi PDF'}
+            </>
+          )}
+        </PDFDownloadLink>
+      </div>
 
       {/* Rezime */}
       <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
