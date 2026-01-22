@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   ChevronDown,
   ChevronUp,
   AlertCircle,
   CheckCircle2,
-  Info
-} from 'lucide-react';
+  Info,
+  Download,
+} from "lucide-react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { ReportPDF } from "./ReportPDF";
 
 interface AnalysisResult {
   parameter: string;
@@ -13,7 +16,7 @@ interface AnalysisResult {
   description: string;
   value: number;
   unit: string;
-  status: 'normal' | 'high' | 'low';
+  status: "normal" | "high" | "low";
   referenceRange: string;
   advice: string;
 }
@@ -27,25 +30,54 @@ interface Props {
 
 export const AnalysisDisplay = ({ data }: Props) => {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  const [showDownload, setShowDownload] = useState(false);
 
   const toggleAccordion = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => setShowDownload(true), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="mt-10 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* PDF preuzimanje */}
+      {showDownload && (
+        <div className="flex justify-end mb-4">
+          <PDFDownloadLink
+            document={
+              <ReportPDF
+                data={data}
+                date={new Date().toLocaleDateString("sr-RS")}
+              />
+            }
+            fileName={`MediSync_Izvestaj_${new Date().getTime()}.pdf`}
+            className="flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-2xl hover:bg-slate-800 transition-all text-sm font-bold shadow-lg hover:shadow-xl active:scale-95"
+          >
+            {({ loading }) => (
+              <>
+                <Download
+                  size={18}
+                  className={loading ? "animate-bounce" : ""}
+                />
+                {loading ? "Priprema izveštaja..." : "Preuzmi PDF"}
+              </>
+            )}
+          </PDFDownloadLink>
+        </div>
+      )}
 
       {/* Rezime */}
       <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
         <div className="flex items-start gap-4">
-          <Info className="text-blue-600 mt-1" size={22} />
+          <Info className="text-blue-600 mt-1" size={25} />
           <div>
             <h3 className="text-xl font-semibold text-slate-900 mb-3">
               Rezime vašeg zdravlja
             </h3>
-            <p className="text-slate-600 leading-relaxed">
-              {data.summary}
-            </p>
+            <p className="text-slate-600 leading-relaxed">{data.summary}</p>
           </div>
         </div>
       </div>
@@ -53,9 +85,7 @@ export const AnalysisDisplay = ({ data }: Props) => {
       {/* Lista parametara */}
       <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b bg-slate-50">
-          <h4 className="font-semibold text-slate-800">
-            Detaljni rezultati
-          </h4>
+          <h4 className="font-semibold text-slate-800">Detaljni rezultati</h4>
           <p className="text-sm text-slate-500">
             Kliknite na parametar za objašnjenje i preporuku.
           </p>
@@ -64,7 +94,7 @@ export const AnalysisDisplay = ({ data }: Props) => {
         <div className="divide-y">
           {data.fullAnalysis.map((res, idx) => {
             const isExpanded = expandedIndex === idx;
-            const isIssue = res.status !== 'normal';
+            const isIssue = res.status !== "normal";
 
             return (
               <div key={idx}>
@@ -76,13 +106,13 @@ export const AnalysisDisplay = ({ data }: Props) => {
                   <div className="flex items-center gap-4">
                     <div
                       className={`p-2 rounded-xl ${
-                        isIssue ? 'bg-red-50' : 'bg-green-50'
+                        isIssue ? "bg-red-50" : "bg-green-50"
                       }`}
                     >
                       {isIssue ? (
-                        <AlertCircle className="text-red-600" size={20} />
+                        <AlertCircle className="text-red-600" size={25} />
                       ) : (
-                        <CheckCircle2 className="text-green-600" size={20} />
+                        <CheckCircle2 className="text-green-600" size={25} />
                       )}
                     </div>
 
@@ -93,14 +123,14 @@ export const AnalysisDisplay = ({ data }: Props) => {
                         </span>
                         <span
                           className={`text-xs px-2 py-1 rounded-full font-medium ${
-                            res.status === 'high'
-                              ? 'bg-red-50 text-red-600'
-                              : res.status === 'low'
-                              ? 'bg-amber-50 text-amber-600'
-                              : 'bg-green-50 text-green-600'
+                            res.status === "high"
+                              ? "bg-red-50 text-red-600"
+                              : res.status === "low"
+                                ? "bg-amber-50 text-amber-600"
+                                : "bg-green-50 text-green-600"
                           }`}
                         >
-                          {res.status === 'normal' ? 'normalno' : res.status}
+                          {res.status === "normal" ? "normalno" : res.status}
                         </span>
                       </div>
                       <p className="text-sm text-slate-500 max-w-md truncate">
@@ -141,16 +171,14 @@ export const AnalysisDisplay = ({ data }: Props) => {
                       <div
                         className={`rounded-xl p-4 border ${
                           isIssue
-                            ? 'bg-amber-50 border-amber-300'
-                            : 'bg-green-50 border-green-300'
+                            ? "bg-amber-50 border-amber-300"
+                            : "bg-green-50 border-green-300"
                         }`}
                       >
                         <p className="font-semibold text-slate-800 mb-1">
                           💡 Preporuka
                         </p>
-                        <p className="text-slate-700 italic">
-                          {res.advice}
-                        </p>
+                        <p className="text-slate-700 italic">{res.advice}</p>
                       </div>
                     </div>
                   </div>
@@ -164,10 +192,10 @@ export const AnalysisDisplay = ({ data }: Props) => {
       {/* Disclaimer */}
       <div className="text-xs text-slate-400 text-center leading-relaxed max-w-3xl mx-auto">
         <strong>VAŽNA NAPOMENA:</strong> Ovi podaci su generisani pomoću
-          veštačke inteligencije (GPT-4o) i služe isključivo u informativne
-          svrhe. Ovo nije zamena za profesionalni lekarski savet, dijagnozu ili
-          lečenje. Uvek se konsultujte sa svojim lekarom pre donošenja bilo
-          kakvih odluka o vašem zdravlju.
+        veštačke inteligencije (GPT-4o) i služe isključivo u informativne svrhe.
+        Ovo nije zamena za profesionalni lekarski savet, dijagnozu ili lečenje.
+        Uvek se konsultujte sa svojim lekarom pre donošenja bilo kakvih odluka o
+        vašem zdravlju.
       </div>
     </div>
   );
