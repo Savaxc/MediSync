@@ -19,15 +19,15 @@ router.post('/upload', requireAuth, upload.single('file'), async (req: any, res)
     const userId = req.auth.userId;
     if (!userId) return res.status(401).json({ error: 'Niste autorizovani' });
 
-    //Dohvatanje email-a od clerk-a (Uzimamo pune podatke o korisniku preko SDK-a)
+    //Dohvatanje email-a od clerk-a
     const clerkUser = await clerkClient.users.getUser(userId);
     const email = clerkUser.emailAddresses[0]?.emailAddress || "no-email@medisync.com";
 
     if (!req.file) return res.status(400).json({ error: 'Nema fajla' });
 
-    const aiAnalysis = await analyzeMedicalReport(req.file.buffer);
+    const aiAnalysis = await analyzeMedicalReport(req.file.buffer, req.file.mimetype);
 
-    //prisma upsert 
+    // Prisma upsert 
     const user = await prisma.user.upsert({
       where: { id: userId },
       update: { email: email },
@@ -41,7 +41,7 @@ router.post('/upload', requireAuth, upload.single('file'), async (req: any, res)
       data: {
         userId: user.id,
         summary: aiAnalysis.summary,
-        fullAnalysis: aiAnalysis.results,
+        fullAnalysis: aiAnalysis.fullAnalysis,
       }
     });
 
@@ -61,7 +61,7 @@ router.get('/history', requireAuth, async (req: any, res) => {
       return res.status(401).json({ error: 'Niste autorizovani' });
     }
 
-    // Pronalazimo sve nalaze za tog korisnika, sortirane od najnovijeg ka najstarijem
+    // Pronalazimo sve nalaze za tog korisnika
     const records = await prisma.medicalRecord.findMany({
       where: { userId: userId },
       orderBy: { createdAt: 'desc' }
