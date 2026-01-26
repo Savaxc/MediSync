@@ -74,4 +74,23 @@ router.get('/history', requireAuth, async (req: any, res) => {
   }
 });
 
+router.delete('/:id', requireAuth, async (req: any, res) => {
+  try {
+    const userId = req.auth.userId;
+    const { id } = req.params;
+
+    const deleted = await prisma.medicalRecord.delete({
+      where: {
+        id: id,
+        userId: userId,
+      },
+    });
+
+    res.json({ message: "Nalaz uspešno obrisan", id: deleted.id });
+  } catch (error) {
+    console.error("Greška pri brisanju:", error);
+    res.status(500).json({ error: "Neuspešno brisanje nalaza." });
+  }
+});
+
 export default router;
