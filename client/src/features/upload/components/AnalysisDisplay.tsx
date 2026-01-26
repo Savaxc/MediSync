@@ -42,7 +42,7 @@ export const AnalysisDisplay = ({ data }: Props) => {
   }, []);
 
   return (
-    <div className="mt-10 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
       {/* PDF preuzimanje */}
       {showDownload && (
         <div className="flex justify-end mb-4">
@@ -70,7 +70,8 @@ export const AnalysisDisplay = ({ data }: Props) => {
       )}
 
       {/* Rezime */}
-      <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+      <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm w-full overflow-hidden">
+        {" "}
         <div className="flex items-start gap-4">
           <Info className="text-blue-600 mt-1" size={25} />
           <div>
@@ -83,15 +84,15 @@ export const AnalysisDisplay = ({ data }: Props) => {
       </div>
 
       {/* Lista parametara */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b bg-slate-50">
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col w-full">
+        {" "}
+        <div className="px-6 py-4 border-b bg-slate-50 flex-shrink-0">
           <h4 className="font-semibold text-slate-800">Detaljni rezultati</h4>
           <p className="text-sm text-slate-500">
             Kliknite na parametar za objašnjenje i preporuku.
           </p>
         </div>
-
-        <div className="divide-y">
+        <div className="divide-y overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent flex-grow">
           {data.fullAnalysis.map((res, idx) => {
             const isExpanded = expandedIndex === idx;
             const isIssue = res.status !== "normal";
@@ -190,7 +191,7 @@ export const AnalysisDisplay = ({ data }: Props) => {
       </div>
 
       {/* Disclaimer */}
-      <div className="text-xs text-slate-400 text-center leading-relaxed max-w-3xl mx-auto">
+      <div className="text-xs text-slate-400 text-center leading-relaxed w-full pb-4">
         <strong>VAŽNA NAPOMENA:</strong> Ovi podaci su generisani pomoću
         veštačke inteligencije (GPT-4o) i služe isključivo u informativne svrhe.
         Ovo nije zamena za profesionalni lekarski savet, dijagnozu ili lečenje.

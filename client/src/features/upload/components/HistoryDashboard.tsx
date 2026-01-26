@@ -83,10 +83,10 @@ export const HistoryDashboard = ({
   };
 
   return (
-    <div className="mt-12 space-y-6">
+    <div className="space-y-6 w-full">
       {/* Grafikon sekcija */}
       {history.length > 0 && (
-        <section className="bg-slate-50 p-6 rounded-3xl border border-slate-200">
+        <section className="bg-slate-50 p-6 rounded-3xl border border-slate-200 w-full">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
               <h2 className="text-xl font-bold text-slate-800">
@@ -133,7 +133,7 @@ export const HistoryDashboard = ({
           Nemate sačuvanih nalaza.
         </div>
       ) : (
-        <div className="grid gap-4 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+        <div className="grid gap-4 w-full overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
           {" "}
           {history.map((record) => (
             <div key={record.id} className="relative group">
