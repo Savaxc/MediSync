@@ -73,7 +73,7 @@ export const AnalysisDisplay = ({ data }: Props) => {
       <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm w-full overflow-hidden">
         {" "}
         <div className="flex items-start gap-4">
-          <Info className="text-blue-600 mt-1" size={25} />
+          <Info className="text-blue-600" size={55} />
           <div>
             <h3 className="text-xl font-semibold text-slate-900 mb-3">
               Rezime vašeg zdravlja
@@ -102,7 +102,7 @@ export const AnalysisDisplay = ({ data }: Props) => {
                 <button
                   onClick={() => toggleAccordion(idx)}
                   aria-expanded={isExpanded}
-                  className="w-full flex justify-between items-center px-6 py-5 text-left hover:bg-slate-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                  className="w-full flex justify-between items-center px-6 py-5 text-left hover:bg-slate-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 hover:cursor-pointer"
                 >
                   <div className="flex items-center gap-4">
                     <div

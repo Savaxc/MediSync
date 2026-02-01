@@ -11,7 +11,13 @@ import {
 import { uploadMedicalReport } from "./features/upload/upload.service";
 import { AnalysisDisplay } from "./features/upload/components/AnalysisDisplay";
 import { HistoryDashboard } from "./features/upload/components/HistoryDashboard";
-import { LayoutDashboard, PlusCircle } from "lucide-react";
+import {
+  LayoutDashboard,
+  PlusCircle,
+  UploadCloud,
+  Activity,
+  X,
+} from "lucide-react";
 
 function App() {
   const [file, setFile] = useState<File | null>(null);
@@ -33,107 +39,204 @@ function App() {
   };
 
   return (
-    <div className="h-screen w-full bg-slate-50 flex flex-col overflow-hidden font-sans">
-      <div className="max-w-5xl w-full mx-auto px-4 py-6 flex flex-col h-full">
+    <div className="h-screen w-full bg-[#F8FAFC] flex flex-col overflow-hidden font-sans text-slate-900">
+      <div className="max-w-7xl w-full mx-auto px-6 md:px-10 py-8 flex flex-col h-full relative">
         {/* Header */}
-        <header className="flex justify-between items-center mb-6 flex-shrink-0">
-          <h1 className="text-2xl font-semibold text-slate-900">
-            MediSync <span className="text-blue-600">AI</span>
-          </h1>
-          <SignedIn>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
+        <header className="flex justify-between items-center mb-10 pb-6 border-b border-slate-200 flex-shrink-0">
+          {/* Logo & Brand */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center bg-white border border-slate-200 p-2 rounded-xl shadow-sm">
+              <Activity className="text-blue-600" size={20} />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-slate-900 leading-none">
+                MediSync <span className="text-blue-600">AI</span>
+              </h1>
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.15em] mt-1">
+                Smart Health Analysis
+              </p>
+            </div>
+          </div>
+
+          {/*: User Akcije */}
+          <div className="flex items-center gap-4">
+            <SignedIn>
+              <div className="h-6 w-[1px] bg-slate-200 mx-2 hidden sm:block" />
+
+              <div className="flex items-center gap-3 group cursor-pointer">
+                <div className="hidden sm:flex flex-col text-right">
+                  <span className="text-xs font-bold text-slate-700 leading-none">
+                    Moj Profil
+                  </span>
+                  <span className="text-[10px] text-green-500 font-medium">
+                    Aktivan
+                  </span>
+                </div>
+                <UserButton
+                  appearance={{
+                    elements: {
+                      userButtonAvatarBox: "w-9 h-9",
+                      userButtonTrigger: "focus:outline-none focus:ring-0",
+                    },
+                  }}
+                  afterSignOutUrl="/"
+                />
+              </div>
+            </SignedIn>
+
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="text-sm font-bold text-slate-600 hover:text-blue-600 hover:cursor-pointer transition-colors">
+                  Prijavi se
+                </button>
+              </SignInButton>
+            </SignedOut>
+          </div>
         </header>
 
         <SignedIn>
-          {/* Navigacija */}
-          <div className="flex bg-white border border-slate-200 rounded-2xl p-1 shadow-sm w-fit mx-auto mb-6 flex-shrink-0">
+          {/* Main Navigacija */}
+          <nav className="flex items-center gap-1 bg-white/70 backdrop-blur-lg border border-slate-200/70 rounded-full p-1 shadow-sm w-fit mx-auto mb-10">
             <button
               onClick={() => {
                 setView("upload");
                 setAnalysis(null);
               }}
-              className={`px-6 py-2 rounded-xl font-medium transition ${
-                view === "upload"
-                  ? "bg-blue-600 text-white shadow"
-                  : "text-slate-500 hover:text-slate-700"
-              }`}
+              className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium transition-all duration-200
+                  ${
+                    view === "upload"
+                      ? "bg-blue-700 text-white shadow-sm hover:cursor-pointer"
+                      : "text-slate-500 hover:text-slate-900 hover:bg-blue-200 hover:cursor-pointer"
+                  }
+                `}
             >
-              <PlusCircle size={16} className="inline mr-2" />
+              <PlusCircle size={16} />
               Novi nalaz
             </button>
 
             <button
               onClick={() => setView("history")}
-              className={`px-6 py-2 rounded-xl font-medium transition ${
-                view === "history"
-                  ? "bg-blue-600 text-white shadow"
-                  : "text-slate-500 hover:text-slate-700"
-              }`}
+              className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium transition-all duration-200
+                  ${
+                    view === "history"
+                      ? "bg-blue-700 text-white shadow-sm hover:cursor-pointer"
+                      : "text-slate-500 hover:text-slate-900 hover:bg-blue-200 hover:cursor-pointer"
+                  }
+                `}
             >
-              <LayoutDashboard size={16} className="inline mr-2" />
+              <LayoutDashboard size={16} />
               Istorija
             </button>
-          </div>
+          </nav>
 
-          <main className="flex-grow overflow-y-auto scrollbar-hide md:scrollbar-default max-w-3xl mx-auto w-full px-1">
-            <div className="pb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          {/* Main Sadrzaj Polje */}
+          <main className="flex-grow overflow-y-auto scrollbar-hide max-w-6xl mx-auto w-full px-2">
+            <div className="pb-12">
               {view === "upload" ? (
-                <div className="w-full">
+                <div className="w-full space-y-6">
                   {!analysis && !loading && (
-                    <div className="bg-white p-10 rounded-3xl border border-slate-200 shadow-sm text-center">
-                      <input
-                        type="file"
-                        onChange={(e) => setFile(e.target.files?.[0] || null)}
-                        className="mx-auto mb-6"
-                      />
-                      <button
-                        onClick={handleProcess}
-                        disabled={!file}
-                        className="bg-blue-600 text-white px-10 py-4 rounded-xl font-semibold hover:bg-blue-700 transition disabled:bg-slate-300"
-                      >
-                        Započni analizu
-                      </button>
+                    <div className="group relative bg-white border-2 border-dashed border-slate-200 p-12 rounded-[2rem] transition-all hover:border-blue-400 hover:bg-blue-50/30 text-center">
+                      <div className="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                        <UploadCloud className="text-blue-600" size={32} />
+                      </div>
+                      <h3 className="text-xl font-bold text-slate-800 mb-2">
+                        Otpremite vaš nalaz
+                      </h3>
+                      <p className="text-slate-500 mb-8 max-w-xs mx-auto">
+                        Slikajte ili izaberite PDF laboratorijskog izveštaja za
+                        analizu.
+                      </p>
+
+                      <div className="flex flex-col items-center justify-center gap-4 mb-8">
+                        {!file ? (
+                          <label className="relative cursor-pointer">
+                            <span className="bg-white border border-slate-200 px-8 py-3 rounded-xl font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors inline-block">
+                              Izaberi fajl
+                            </span>
+                            <input
+                              type="file"
+                              className="hidden"
+                              onChange={(e) =>
+                                setFile(e.target.files?.[0] || null)
+                              }
+                            />
+                          </label>
+                        ) : (
+                          <div className="flex items-center gap-2 bg-blue-50/50 border border-blue-100 pl-4 pr-2 py-2 rounded-xl animate-in fade-in zoom-in-95">
+                            <span className="text-sm font-semibold text-blue-700 max-w-[700px] truncate">
+                              {file.name}
+                            </span>
+                            <button
+                              onClick={() => setFile(null)}
+                              className="p-1 hover:bg-blue-100 rounded-lg text-blue-400 hover:text-blue-600 transition-colors cursor-pointer"
+                              title="Ukloni fajl"
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="pt-4">
+                        <button
+                          onClick={handleProcess}
+                          disabled={!file}
+                          className="w-full bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none active:scale-95 hover:cursor-pointer"
+                        >
+                          Započni AI analizu
+                        </button>
+                      </div>
                     </div>
                   )}
 
                   {loading && (
-                    <div className="py-20 text-center text-slate-600">
-                      <div className="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
-                      <p>AI analizira nalaz...</p>
+                    <div className="py-24 text-center">
+                      <div className="relative w-20 h-20 mx-auto mb-8">
+                        <div className="absolute inset-0 border-4 border-blue-100 rounded-full"></div>
+                        <div className="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                      <h3 className="text-xl font-bold text-slate-800 animate-pulse">
+                        Analiziramo vaše podatke...
+                      </h3>
+                      <p className="text-slate-500 mt-2">
+                        Ovo obično traje par sekundi.
+                      </p>
                     </div>
                   )}
 
                   {analysis && <AnalysisDisplay data={analysis} />}
                 </div>
               ) : (
-                <div className="w-full">
-                  <HistoryDashboard
-                    onSelectRecord={(record) => {
-                      setAnalysis(record);
-                      setView("upload");
-                    }}
-                  />
-                </div>
+                <HistoryDashboard
+                  onSelectRecord={(record) => {
+                    setAnalysis(record);
+                    setView("upload");
+                  }}
+                />
               )}
             </div>
           </main>
         </SignedIn>
 
         <SignedOut>
-          <main className="flex-grow overflow-y-auto">
-            <section className="relative w-full py-20 bg-gradient-to-b from-blue-50 to-white border border-blue-100 rounded-3xl overflow-hidden text-center px-6">
-              <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">
-                Razumite svoje nalaze <br />
-                <span className="text-blue-600">na jednostavan način.</span>
-              </h2>
-              <p className="text-xl text-slate-600 leading-relaxed max-w-2xl mx-auto mt-6">
-                MediSync koristi veštačku inteligenciju da Vam objasni
-                laboratorijske rezultate bez komplikovanih reči.
-              </p>
-              <div className="pt-10">
+          <main className="flex-grow flex items-center justify-center">
+            <section className="w-full max-w-6xl py-24 bg-white border border-slate-200 rounded-[4rem] shadow-2xl shadow-slate-200/60 text-center px-10 relative overflow-hidden transition-all hover:shadow-blue-100/50">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-32 -mt-32 blur-3xl opacity-50" />
+
+              <div className="relative">
+                <h2 className="text-5xl md:text-6xl font-black text-slate-900 leading-[1.1] mb-8">
+                  Razumite svoje nalaze <br />
+                  <span className="text-5xl text-blue-600">
+                    na jednostavan način.
+                  </span>
+                </h2>
+                <p className="text-lg text-slate-500 leading-relaxed max-w-xl mx-auto mb-12">
+                  MediSync koristi naprednu veštačku inteligenciju da pretvori
+                  vaše laboratorijske rezultate u jasne i korisne informacije.
+                </p>
+
                 <SignInButton mode="modal">
-                  <button className="bg-blue-600 text-white px-14 py-5 rounded-2xl font-bold text-lg shadow-xl hover:bg-blue-700 transition-all">
+                  <button className="bg-slate-900 text-white px-12 py-5 rounded-2xl font-bold text-lg shadow-2xl shadow-blue-200 hover:bg-blue-700 hover:cursor-pointer transition-all active:scale-95">
                     Započni besplatno
                   </button>
                 </SignInButton>
@@ -142,8 +245,11 @@ function App() {
           </main>
         </SignedOut>
 
-        <footer className="py-4 text-center text-xs text-slate-400 flex-shrink-0">
-          © 2026 MediSync AI
+        <footer className="text-center flex-shrink-0">
+          <div className="flex justify-center gap-6 mb-4"></div>
+          <p className="text-xs font-medium text-slate-400 tracking-widest uppercase">
+            © 2026 MediSync AI • Vaša privatnost je prioritet
+          </p>
         </footer>
       </div>
     </div>

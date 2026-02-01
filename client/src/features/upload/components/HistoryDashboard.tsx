@@ -98,7 +98,7 @@ export const HistoryDashboard = ({
             </div>
             <select
               onChange={(e) => setSelectedParam(e.target.value)}
-              className="p-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+              className="p-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none hover:cursor-pointer"
             >
               <option value="">Izaberi parametar...</option>
               {allParams.map((p) => (
@@ -139,7 +139,7 @@ export const HistoryDashboard = ({
             <div key={record.id} className="relative group">
               <button
                 onClick={() => onSelectRecord(record)}
-                className="w-full flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition text-left"
+                className="w-full flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition text-left hover:cursor-pointer"
               >
                 <div className="flex items-center gap-4">
                   <div className="bg-blue-50 p-3 rounded-xl text-blue-600">
@@ -162,7 +162,7 @@ export const HistoryDashboard = ({
               {/* Delete dugme */}
               <button
                 onClick={(e) => openDeleteModal(e, record.id)}
-                className="absolute right-12 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                className="absolute right-12 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors hover:cursor-pointer"
                 title="Obriši nalaz"
               >
                 <Trash2 size={18} />
