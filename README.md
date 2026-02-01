@@ -10,7 +10,7 @@
 ---
 
 ### Home Screen
-![MediSync HomeScreen](client/public/pic/home-screen.png)
+![MediSync HomeScreen](client/public/pic/home-sreen.png)
 
 ### Dashboard
 ![MediSync Dashboard](client/public/pic/dashboard-preview.png)
