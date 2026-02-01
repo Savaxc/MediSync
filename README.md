@@ -10,16 +10,16 @@
 ---
 
 ### Home Screen
-![MediSync HomeScreen](./public/pic/home-screen.png)
+![MediSync HomeScreen](client/public/pic/home-screen.png)
 
 ### Dashboard
-![MediSync Dashboard](./public/pic/dashboard-preview.png)
+![MediSync Dashboard](client/public/pic/dashboard-preview.png)
 
 ### History
-![MediSync History](./public/pic/history-preview.png)
+![MediSync History](client/public/pic/history-preview.png)
 
 ### Summary
-![MediSync Summary](./public/pic/rezime-izvestaja.png)
+![MediSync Summary](client/public/pic/rezime-izvestaja.png)
 
 ---
 
