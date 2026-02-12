@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   SignedIn,
   SignedOut,
@@ -18,6 +17,7 @@ import {
   Activity,
   X,
 } from "lucide-react";
+import { useDropzone } from "react-dropzone";
 
 function App() {
   const [file, setFile] = useState<File | null>(null);
@@ -37,6 +37,21 @@ function App() {
       setLoading(false);
     }
   };
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles.length > 0) {
+      setFile(acceptedFiles[0]);
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "application/pdf": [".pdf"],
+      "image/*": [".jpeg", ".jpg", ".png"],
+    },
+    multiple: false,
+  });
 
   return (
     <div className="h-screen w-full bg-[#F8FAFC] flex flex-col overflow-hidden font-sans text-slate-900">
@@ -58,7 +73,7 @@ function App() {
             </div>
           </div>
 
-          {/*: User Akcije */}
+          {/* User Akcije */}
           <div className="flex items-center gap-4">
             <SignedIn>
               <div className="h-6 w-[1px] bg-slate-200 mx-2 hidden sm:block" />
@@ -135,39 +150,56 @@ function App() {
               {view === "upload" ? (
                 <div className="w-full space-y-6">
                   {!analysis && !loading && (
-                    <div className="group relative bg-white border-2 border-dashed border-slate-200 p-12 rounded-[2rem] transition-all hover:border-blue-400 hover:bg-blue-50/30 text-center">
-                      <div className="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                        <UploadCloud className="text-blue-600" size={32} />
+                    <div
+                      {...getRootProps()}
+                      className={`
+              group relative bg-white border-2 border-dashed border-slate-200 p-12 rounded-[2rem] transition-all hover:border-blue-400 hover:bg-blue-50/30 text-center cursor-pointer
+              ${
+                isDragActive
+                  ? "border-blue-500 bg-blue-50/50 scale-[1.01] shadow-xl shadow-blue-100/50"
+                  : "border-slate-200 bg-white hover:border-blue-400 hover:bg-blue-50/20"
+              }
+            `}
+                    >
+                      <input {...getInputProps()} />
+
+                      <div
+                        className={`
+              bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform
+              ${isDragActive ? "bg-blue-600 text-white scale-110" : "bg-blue-50 text-blue-600 group-hover:scale-110"}
+            `}
+                      >
+                        <UploadCloud size={35} />
                       </div>
+
                       <h3 className="text-xl font-bold text-slate-800 mb-2">
-                        Otpremite vaš nalaz
+                        {isDragActive
+                          ? "Samo pustite fajl ovde"
+                          : "Otpremite vaš nalaz"}
                       </h3>
+
                       <p className="text-slate-500 mb-8 max-w-xs mx-auto">
-                        Slikajte ili izaberite PDF laboratorijskog izveštaja za
-                        analizu.
+                        Prevucite PDF ili fotografiju nalaza direktno ovde, ili
+                        kliknite za pretragu.
                       </p>
 
-                      <div className="flex flex-col items-center justify-center gap-4 mb-8">
+                      {/* Prikaz fajla/dugmeta */}
+                      <div
+                        className="flex flex-col items-center justify-center gap-4 mb-8">
                         {!file ? (
-                          <label className="relative cursor-pointer">
-                            <span className="bg-white border border-slate-200 px-8 py-3 rounded-xl font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors inline-block">
-                              Izaberi fajl
-                            </span>
-                            <input
-                              type="file"
-                              className="hidden"
-                              onChange={(e) =>
-                                setFile(e.target.files?.[0] || null)
-                              }
-                            />
-                          </label>
+                          <div className="bg-white border-2 border-slate-100 px-10 py-4 rounded-2xl font-bold text-slate-700 shadow-sm group-hover:border-blue-200 transition-all text-lg">
+                            Odaberi dokument
+                          </div>
                         ) : (
                           <div className="flex items-center gap-2 bg-blue-50/50 border border-blue-100 pl-4 pr-2 py-2 rounded-xl animate-in fade-in zoom-in-95">
                             <span className="text-sm font-semibold text-blue-700 max-w-[700px] truncate">
                               {file.name}
                             </span>
                             <button
-                              onClick={() => setFile(null)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setFile(null);
+                              }}
                               className="p-1 hover:bg-blue-100 rounded-lg text-blue-400 hover:text-blue-600 transition-colors cursor-pointer"
                               title="Ukloni fajl"
                             >
@@ -177,15 +209,21 @@ function App() {
                         )}
                       </div>
 
-                      <div className="pt-4">
-                        <button
-                          onClick={handleProcess}
-                          disabled={!file}
-                          className="w-full bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-slate-200 disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none active:scale-95 hover:cursor-pointer"
+                      {/* Dugme za akciju */}
+                      {file && (
+                        <div
+                          className="mt-10 pt-8 border-t border-slate-100 w-full flex justify-center animate-in slide-in-from-top-4"
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          Započni AI analizu
-                        </button>
-                      </div>
+                          <button
+                            onClick={handleProcess}
+                            disabled={!file}
+                            className="w-full max-w-md bg-slate-900 text-white px-12 py-4 rounded-[2rem] font-black text-lg hover:bg-blue-600 transition-all shadow-2xl shadow-slate-200 active:scale-95 cursor-pointer"
+                          >
+                            Započni AI analizu
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -203,7 +241,6 @@ function App() {
                       </p>
                     </div>
                   )}
-
                   {analysis && <AnalysisDisplay data={analysis} />}
                 </div>
               ) : (
